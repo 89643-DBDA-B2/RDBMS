@@ -1,0 +1,260 @@
+1. Write a query that lists each order number followed by the name of the customer who
+made the order.
+mysql> select o.onum, c.cname from orders o left outer join customers c on o.cnum=c.cnum;
++------+----------+
+| onum | cname    |
++------+----------+
+| 3001 | Cisneros |
+| 3003 | Hoffman  |
+| 3002 | Pereira  |
+| 3005 | Liu      |
+| 3006 | Cisneros |
+| 3009 | Giovanni |
+| 3007 | Grass    |
+| 3008 | Clemens  |
+| 3010 | Grass    |
+| 3011 | Clemens  |
++------+----------+
+
+2. Write a query that gives the names of both the salesperson and the customer for
+each order along with the order number.
+mysql> select o.onum, c.cname, s.sname from orders o inner join customers c on o.cnum=c.cnum left outer join salespeople s on o.snum=s.snum;
++------+----------+---------+
+| onum | cname    | sname   |
++------+----------+---------+
+| 3001 | Cisneros | Rifkin  |
+| 3003 | Hoffman  | Peel    |
+| 3002 | Pereira  | Motika  |
+| 3005 | Liu      | Serres  |
+| 3006 | Cisneros | Rifkin  |
+| 3009 | Giovanni | Axelrod |
+| 3007 | Grass    | Serres  |
+| 3008 | Clemens  | Peel    |
+| 3010 | Grass    | Serres  |
+| 3011 | Clemens  | Peel    |
++------+----------+---------+
+
+3. Write a query that produces all customers serviced by salespeople with a commission
+above 12%. Output the customer’s name, the salesperson’s name, and the
+salesperson’s rate of commission.
+mysql> select c.cname from customers c inner join salespeople s on c.snum=s.snum where s.comm>0.12;
++----------+
+| cname    |
++----------+
+| Liu      |
+| Grass    |
+| Cisneros |
++----------+
+
+4. Write a query that calculates the amount of the salesperson’s commission on each
+order by a customer with a rating above 100.
+mysql> select distimysql> select distinct s.sname, o.onum, s.comm, (o.amt * s.comm) tamt from salespeople s inner join customers c on s.snum=c.snum left outer join orders o on o.snum = s.snum where c.rating>100;
++---------+------+------+----------+
+| sname   | onum | comm | tamt     |
++---------+------+------+----------+
+| Serres  | 3010 | 0.13 |  40.2935 |
+| Serres  | 3007 | 0.13 |   9.8475 |
+| Serres  | 3005 | 0.13 | 670.8585 |
+| Rifkin  | 3006 | 0.15 | 164.7240 |
+| Rifkin  | 3001 | 0.15 |   2.8035 |
+| Axelrod | 3009 | 0.10 | 171.3230 |
++---------+------+------+----------+
+
+5. Write a query that produces all pairs of salespeople who are living in the same
+city.Exclude combinations of salespeople with themselves as well as duplicate rows
+with the order reversed.
+mysql> select s.city, s.sname, sa.sname from salespeople s inner join salespeople sa on s.city = sa.city where s.sname<>sa.sname and s.sname>sa.sname;
++--------+-------+--------+
+| city   | sname | sname  |
++--------+-------+--------+
+| London | Peel  | Motika |
++--------+-------+--------+
+
+
+1. Display the Supplier name and the Quantity sold.
+mysql> select s.sname, sum(q.qty) from S s inner join sp q on s.`S#`=q.`S#` group by s.sname;
++-------+------------+
+| sname | sum(q.qty) |
++-------+------------+
+| Smith |        900 |
+| Jones |       3200 |
+| Blake |        700 |
+| Clark |        600 |
+| Adams |       3100 |
++-------+------------+
+
+2. Display the Part name and Quantity sold.
+mysql> select s.pname, sum(q.qty) from P s inner join sp q on s.`P#`=q.`P#` group by s.pname;
++-------+------------+
+| pname | sum(q.qty) |
++-------+------------+
+| Nut   |       1000 |
+| Screw |       4800 |
+| Cam   |       1100 |
+| Cog   |       1300 |
+| Bolt  |        300 |
++-------+------------+
+
+3. Display the Job name and Quantity sold.
+mysql> select s.Jname, sum(q.qty) from J s inner join sp q on s.`J#`=q.`J#` group by s.Jname;
++----------+------------+
+| Jname    | sum(q.qty) |
++----------+------------+
+| Sorter   |        800 |
+| Console  |       3300 |
+| Punch    |       1200 |
+| Reader   |        500 |
+| Collator |       1100 |
+| Terminal |        400 |
+| Tape     |       1200 |
++----------+------------+
+
+4. Display the Supplier name, Part name, Job name and Quantity sold.
+mysql> select distinct s.sname, p.pname, j.jname,q.qty from sp q inner join P p on p.`P#`=q
+.`P#` inne
++-------+-------+----------+------+
+| sname | pname | jname    | qty  |
++-------+-------+----------+------+
+| Jones | Screw | Sorter   |  400 |
+| Blake | Screw | Sorter   |  200 |
+| Smith | Nut   | Sorter   |  200 |
+| Adams | Cog   | Punch    |  200 |
+| Jones | Cam   | Punch    |  100 |
+| Blake | Screw | Punch    |  500 |
+| Jones | Screw | Punch    |  200 |
+| Adams | Bolt  | Punch    |  200 |
+| Clark | Cog   | Reader   |  300 |
+| Jones | Screw | Reader   |  200 |
+| Adams | Cog   | Console  |  500 |
+| Adams | Cam   | Console  |  400 |
+| Adams | Screw | Console  |  800 |
+| Jones | Screw | Console  |  500 |
+| Adams | Screw | Console  |  200 |
+| Adams | Bolt  | Console  |  100 |
+| Smith | Nut   | Console  |  700 |
+| Adams | Nut   | Console  |  100 |
+| Adams | Cam   | Collator |  500 |
+| Jones | Screw | Collator |  600 |
+| Jones | Screw | Terminal |  400 |
+| Clark | Cog   | Tape     |  300 |
+| Adams | Cam   | Tape     |  100 |
+| Jones | Screw | Tape     |  800 |
++-------+-------+----------+------+
+
+5. Display the Supplier name, Supplying Parts to a Job in the same City.
+mysql> select distinct S.Sname from sp inner join S on sp.`S#`=S.`S#` inner join
+ P on sp.`P#`=P.`P#` inner join J on sp.`J#`=J.`J#` where S.city = J.city;
++-------+
+| Sname |
++-------+
+| Adams |
+| Blake |
+| Jones |
+| Clark |
++-------+
+
+6. Display the Part name that is ‘Red’ is color, and the Quantity sold.
+mysql> select distinct P.pname, sum(sp.qty) from sp inner join P on P.`P#`=sp.`P
+#` where P.color = 'red' group by P.pname;
++-------+-------------+
+| pname | sum(sp.qty) |
++-------+-------------+
+| Nut   |        1000 |
+| Screw |        1300 |
+| Cog   |        1300 |
++-------+-------------+
+
+7. Display all the Quantity sold by Suppliers with the Status = 20.
+mysql> select S.sname,sum(sp.qty) from sp inner join S on S.`S#`=sp.`S#` where S.status=20 group by S.sname;
++-------+-------------+
+| sname | sum(sp.qty) |
++-------+-------------+
+| Smith |         900 |
+| Clark |         600 |
++-------+-------------+
+
+8. Display all the Parts and Quantity with a Weight > 14.
+mysql> select P.pname, sum(sp.qty) from sp inner join P on P.`P#`=sp.`p#` where
+P.weight>14 group by P.pname;
++-------+-------------+
+| pname | sum(sp.qty) |
++-------+-------------+
+| Screw |        3500 |
+| Cog   |        1300 |
+| Bolt  |         300 |
++-------+-------------+
+9. Display all the Job names and City, which has bought more than 500 Parts.
+mysql> select J.Jname,J.city, sum(sp.qty) total from sp inner join J on J.`J#`=sp.`J#` group by J.Jname,J.city HAVING total>500;
++----------+--------+-------+
+| Jname    | city   | total |
++----------+--------+-------+
+| Sorter   | Paris  |   800 |
+| Console  | Athens |  3300 |
+| Punch    | Rome   |  1200 |
+| Collator | London |  1100 |
+| Tape     | London |  1200 |
++----------+--------+-------+
+10. Display all the Part names and Quantity sold that have a Weight less than 15.
+mysql> select P.pname, sum(sp.qty) from sp inner join P on P.`P#`=sp.`P#` where
+P.weight < 15 group by P.pname;
++-------+-------------+
+| pname | sum(sp.qty) |
++-------+-------------+
+| Nut   |        1000 |
+| Cam   |        1100 |
+| Screw |        1300 |
++-------+-------------+
+
+11. Display all the Suppliers with the same Status as the supplier, ‘CLARK’.
+mysql> select s.sname as s1name,s.status as s1status from S s cross join S sa where sa.sname='clark' and s.status=sa.status and sa.sname <> s.sname;
++--------+----------+
+| s1name | s1status |
++--------+----------+
+| Smith  |       20 |
++--------+----------+
+
+12. Display all the Parts which have more Weight than any Red parts.
+mysql> select p1.pname from P p1 cross join P p2 where p2.color = 'red' group by p1.pname, p1.weight  having p1.weight > min(p2.weight);
++-------+
+| pname |
++-------+
+| Bolt  |
+| Screw |
+| Screw |
+| Cog   |
++-------+
+13. Display all the Jobs going on in the same city as the job ‘TAPE’.
+mysql> select j1.jname from J j1 cross join J j2 where j2.jname = 'tape' and j1.city=j2.city and j1.jname <> 'tape';
++----------+
+| jname    |
++----------+
+| Collator |
++----------+
+
+14. Display all the Parts with Weight less than any the Green parts.
+mysql> select p1.pname from P p1 cross join P p2 where p2.color='green' group by p1.pname,p1.weight having p1.weight < max(p2.weight);
++-------+
+| pname |
++-------+
+| Nut   |
+| Screw |
+| Cam   |
++-------+
+
+15. Display the name of the Supplier who has sold the maximum Quantity (in onesale).
+mysql> select distinct s.sname, max(sp.qty) max from sp inner join S s on s.`S#`=sp.`S#` group by s.sname order by max desc limit 1;
++-------+------+
+| sname | max  |
++-------+------+
+| Adams |  800 |
++-------+------+
+
+16. Display the name of the Supplier who has sold the maximum overall Quantity
+(sumof Sales)
+mysql> select s.sname, sum(sp.qty) sales from sp inner join S s on s.`S#`=sp.`S#` group by s.sname order by sales desc limit 1;
++-------+-------+
+| sname | sales |
++-------+-------+
+| Jones |  3200 |
++-------+-------+
+
